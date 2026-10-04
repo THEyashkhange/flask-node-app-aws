@@ -33,4 +33,4 @@ def handle_submit():
 
 
 if __name__ == "__main__":
-  app.run(host="0.0.0.0", port=5000, debug=True)
+  app.run(host="http://13.218.169.114/", port=5000, debug=True)
