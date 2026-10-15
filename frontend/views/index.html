@@ -1,4 +1,233 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <title>DevOps Task 1 - User Submission Form</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f4f7fb;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 450px;
+            padding: 30px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 25px;
+            color: #222;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        input {
+            display: block;
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 15px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 4px rgba(0, 123, 255, 0.3);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: #0056b3;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+
+        #responseMessage {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-align: center;
+            overflow-wrap: anywhere;
+        }
+
+        #responseMessage:empty {
+            display: none;
+        }
+
+        .success {
+            color: #155724;
+            background-color: #d4edda;
+        }
+
+        .error {
+            color: #721c24;
+            background-color: #f8d7da;
+        }
+
+        .info {
+            color: #084298;
+            background-color: #cfe2ff;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="container">
+        <h2>User Submission Form</h2>
+
+        <form id="userForm">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    placeholder="Enter your name"
+                    autocomplete="name"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="Enter your email"
+                    autocomplete="email"
+                    required
+                >
+            </div>
+
+            <button type="submit" id="submitButton">
+                Submit Data
+            </button>
+        </form>
+
+        <div
+            id="responseMessage"
+            role="status"
+            aria-live="polite"
+        ></div>
+    </main>
+
+    <script>
+        const userForm = document.getElementById('userForm');
+        const messageElement = document.getElementById('responseMessage');
+        const submitButton = document.getElementById('submitButton');
+
+        function showMessage(message, type) {
+            messageElement.textContent = message;
+            messageElement.className = type;
+        }
+
+        userForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+
+            if (!name || !email) {
+                showMessage('Please enter both name and email.', 'error');
+                return;
+            }
+
+            submitButton.disabled = true;
+            submitButton.textContent = 'Submitting...';
+
+            showMessage('Submitting your data...', 'info');
+
+            try {
+                const response = await fetch('/api/submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        email: email
+                    })
+                });
+
+                const contentType = response.headers.get('content-type') || '';
+
+                if (!contentType.includes('application/json')) {
+                    throw new Error('The server returned an unexpected response.');
+                }
+
+                const data = await response.json();
+
+                if (!response.ok || data.status !== 'success') {
+                    throw new Error(data.message || 'Submission failed.');
+                }
+
+                showMessage(
+                    data.message || 'Data submitted successfully!',
+                    'success'
+                );
+
+                userForm.reset();
+
+            } catch (error) {
+                console.error('Submission failed:', error);
+
+                showMessage(
+                    error.message || 'Could not reach the application server. Please try again.',
+                    'error'
+                );
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Submit Data';
+            }
+        });
+    </script>
+</body>
+</html>
+```
 <!DOCTYPE html>
 <html lang="en">
 <head>
